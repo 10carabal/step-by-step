@@ -3,10 +3,16 @@ import { PreloadAllModules, RouteReuseStrategy, provideRouter, withComponentInpu
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
 
 import { inject, provideAppInitializer } from '@angular/core';
+import { initializeApp } from 'firebase/app';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { CategoryService } from './app/services/category-service';
 import { TaskService } from './app/services/task-service';
+
+import { RemoteConfigService } from './app/services/remote-config-service';
+import { environment } from './environments/environment';
+
+initializeApp(environment.firebase);
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -16,7 +22,9 @@ bootstrapApplication(AppComponent, {
     provideAppInitializer(() => {
       const categoryService = inject(CategoryService);
       const taskService = inject(TaskService);
-      return Promise.all([categoryService.initialize(), taskService.initialize()]);
+      const remoteConfigService = inject(RemoteConfigService);
+
+      return Promise.all([categoryService.initialize(), taskService.initialize(), remoteConfigService.initialize()]);
     }),
   ],
 });
