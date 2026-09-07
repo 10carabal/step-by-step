@@ -7,11 +7,10 @@ workflows:
       groups:
         - firebase_credentials
       vars:
-        XCODE_WORKSPACE: "App.xcworkspace"
+        XCODE_PROJECT: "App.xcodeproj"
         XCODE_SCHEME: "App"
       node: 22
       xcode: latest
-      cocoapods: default
     scripts:
       - name: Install npm dependencies
         script: npm install
@@ -54,18 +53,10 @@ workflows:
             npx cap add ios
           fi
           npx cap sync ios
-      - name: Verify Podfile exists
-        script: |
-          ls -la ios/App/
-          cat ios/App/Podfile
-      - name: Install CocoaPods dependencies
-        script: |
-          cd ios/App
-          pod install
       - name: Build unsigned IPA (ad-hoc, no App Store)
         script: |
           cd ios/App
-          xcodebuild -workspace $XCODE_WORKSPACE \
+          xcodebuild -project $XCODE_PROJECT \
             -scheme $XCODE_SCHEME \
             -configuration Debug \
             -sdk iphoneos \
