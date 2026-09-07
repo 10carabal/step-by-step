@@ -10,9 +10,12 @@ import { CategoryService } from './app/services/category-service';
 import { TaskService } from './app/services/task-service';
 
 import { RemoteConfigService } from './app/services/remote-config-service';
+import { registerAppIcons } from './assets/icons';
 import { environment } from './environments/environment';
 
 initializeApp(environment.firebase);
+
+registerAppIcons();
 
 bootstrapApplication(AppComponent, {
   providers: [

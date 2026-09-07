@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Manage Categories</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item lines="full">
+    <ion-input placeholder="New category name..." [value]="newCategoryName()"
+      (ionInput)="newCategoryName.set($event.detail.value ?? '')" (keyup.enter)="addCategory()"></ion-input>
+    <ion-button slot="end" fill="clear" (click)="addCategory()">
+      <ion-icon name="add-circle" slot="icon-only"></ion-icon>
+    </ion-button>
+  </ion-item>
+
+  <ion-list>
+    @for (category of categoryService.categories(); track category.id) {
+    <ion-item-sliding>
+      <ion-item>
+        <span class="dot" [style.background]="category.color"></span>
+        <ion-label>{{ category.name }}</ion-label>
+        <ion-button slot="end" fill="clear" (click)="editCategory(category.id, category.name)">
+          <ion-icon name="pencil" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button slot="end" fill="clear" color="danger" (click)="confirmDelete(category.id, category.name)">
+          <ion-icon name="trash" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="confirmDelete(category.id, category.name)">
+          Delete
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+    }
+  </ion-list>
+
+  @if (categoryService.categories().length === 0) {
+  <div class="empty-state">
+    <ion-icon name="folder-outline"></ion-icon>
+    <p>No categories yet</p>
+  </div>
+  }
+</ion-content>

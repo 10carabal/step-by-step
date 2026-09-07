@@ -17,8 +17,6 @@ export class CategoryService {
   readonly categories = this._categories.asReadonly();
 
   readonly totalCategories = computed(() => this._categories().length);
-  CATEGORY_COLORS: any;
-
 
   async initialize(): Promise<void> {
     await this.loadCategories();
@@ -39,7 +37,7 @@ export class CategoryService {
 
   private nextColor(): string {
     const usedCount = this._categories().length;
-    return this.CATEGORY_COLORS[usedCount % this.CATEGORY_COLORS.length];
+    return CATEGORY_COLORS[usedCount % CATEGORY_COLORS.length];
   }
 
   async addCategory(name: string): Promise<void> {

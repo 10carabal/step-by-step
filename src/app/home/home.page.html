@@ -1,13 +1,19 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Step by Step</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openCategoryManager()">
+        <ion-icon name="folder-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
 
   <ion-item lines="full">
-    <ion-input placeholder="Add a new task..." [formField]="newTaskForm.title" (keyup.enter)="addTask()"></ion-input>
+    <ion-input placeholder="Add a new task..." [value]="newTaskTitle()"
+      (ionInput)="newTaskTitle.set($event.detail.value ?? '')" (keyup.enter)="addTask()"></ion-input>
     <ion-button slot="end" fill="clear" (click)="addTask()">
       <ion-icon name="add-circle" slot="icon-only"></ion-icon>
     </ion-button>
@@ -17,20 +23,17 @@
     (ionInput)="onSearchChange($event.detail.value ?? '')"></ion-searchbar>
 
   <!-- filter by category -->
-  <ion-segment scrollable [value]="taskService.activeCategoryId() ?? 'uncategorized'"
-    (ionChange)="onCategoryFilterChange($event.detail.value)">
-    <ion-segment-button value="all">
-      <ion-label>All</ion-label>
-    </ion-segment-button>
-    @for (category of categoryService.categories(); track category.id) {
-    <ion-segment-button [value]="category.id">
-      <ion-label>{{ category.name }}</ion-label>
-    </ion-segment-button>
-    }
-    <ion-segment-button value="uncategorized">
-      <ion-label>Uncategorized</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <ion-item lines="full">
+    <ion-select label="Filter by category" labelPlacement="stacked" interface="popover"
+      [value]="taskService.activeCategoryId() ?? 'uncategorized'"
+      (ionChange)="onCategoryFilterChange($event.detail.value)">
+      <ion-select-option value="all">All</ion-select-option>
+      @for (category of categoryService.categories(); track category.id) {
+      <ion-select-option [value]="category.id">{{ category.name }}</ion-select-option>
+      }
+      <ion-select-option value="uncategorized">Uncategorized</ion-select-option>
+    </ion-select>
+  </ion-item>
 
   @if (remoteConfigService.enableGroupedView()) {
   @for (group of groupedTasks(); track group.category?.id ?? 'uncategorized') {
@@ -74,8 +77,11 @@
       <ion-item-sliding>
         <ion-item>
           <ion-checkbox slot="start" [checked]="task.completed" (ionChange)="toggleComplete(task.id)"></ion-checkbox>
-          <span class="category-dot" [style.background]="getCategoryColor(task.categoryId)"></span>
-          <ion-label [class.completed-task]="task.completed">
+          <ion-chip (click)="assignCategory(task.id)" [style.--background]="getCategoryColor(task.categoryId) + '22'">
+            <span class="dot" [style.background]="getCategoryColor(task.categoryId)"></span>
+            <ion-label>{{ getCategoryName(task.categoryId) }}</ion-label>
+          </ion-chip>
+          <ion-label [class.completed-task]=" task.completed">
             {{ task.title }}
           </ion-label>
           <ion-reorder slot="end"></ion-reorder>
@@ -98,31 +104,6 @@
   }
   }
 
-  <ion-item lines="full">
-    <ion-input placeholder="New category name..." [formField]="newCategoryForm.name"
-      (keyup.enter)="addCategory()"></ion-input>
-    <ion-button slot="end" fill="clear" (click)="addCategory()">
-      <ion-icon name="pricetag" slot="icon-only"></ion-icon>
-    </ion-button>
-  </ion-item>
 
-  <ion-list>
-    @for (category of categoryService.categories(); track category.id) {
-    <ion-item-sliding>
-      <ion-item>
-        <span class="category-dot" [style.background]="category.color"></span>
-        <ion-label>{{ category.name }}</ion-label>
-        <ion-button slot="end" fill="clear" (click)="editCategory(category.id, category.name)">
-          <ion-icon name="pencil" slot="icon-only"></ion-icon>
-        </ion-button>
-      </ion-item>
-      <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deleteCategory(category.id)">
-          Delete
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-    }
-  </ion-list>
 
 </ion-content>

@@ -24,4 +24,17 @@
     font-size: 64px;
     margin-bottom: 12px;
   }
+
+  ion-chip {
+    cursor: pointer;
+    font-size: 0.75rem;
+    height: 24px;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+  }
 }

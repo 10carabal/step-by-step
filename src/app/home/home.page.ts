@@ -1,9 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { form, FormField, required } from '@angular/forms/signals';
 import {
+  ActionSheetController,
   AlertController,
   IonButton,
+  IonButtons,
   IonCheckbox,
+  IonChip,
   IonContent, IonHeader, IonIcon, IonInput, IonItem,
   IonItemOption, IonItemOptions,
   IonItemSliding,
@@ -12,11 +14,11 @@ import {
   IonReorder,
   IonReorderGroup,
   IonSearchbar,
-  IonSegment,
-  IonSegmentButton,
+  IonSelect, IonSelectOption,
   IonTitle, IonToolbar, ItemReorderEventDetail,
-  SegmentValue
+  ModalController
 } from '@ionic/angular';
+import { CategoryComponent } from '../components/category/category.component';
 import { Category } from '../models/category.model';
 import { Task } from '../models/task.model';
 import { CategoryService } from '../services/category-service';
@@ -33,7 +35,7 @@ interface TaskGroup {
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonItemOption, IonItemOptions, IonReorder, IonCheckbox, IonItemSliding, IonList, IonListHeader, IonReorderGroup, IonLabel, IonSegmentButton, FormField, IonSearchbar, IonSegment, IonIcon, IonInput, IonItem, IonButton, IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [IonChip, IonButtons, IonItemOption, IonItemOptions, IonReorder, IonCheckbox, IonItemSliding, IonList, IonListHeader, IonReorderGroup, IonLabel, IonSelect, IonSelectOption, IonSearchbar, IonIcon, IonInput, IonItem, IonButton, IonHeader, IonToolbar, IonTitle, IonContent],
 })
 export class HomePage {
   protected readonly taskService = inject(TaskService);
@@ -41,9 +43,13 @@ export class HomePage {
   protected readonly remoteConfigService = inject(RemoteConfigService);
 
   private readonly alertController = inject(AlertController);
+  private readonly modalController = inject(ModalController);
+  private readonly actionSheetController = inject(ActionSheetController);
+
+  protected readonly newTaskTitle = signal('');
 
   //--- Signal Forms ---
-  protected readonly newTaskModel = signal({ title: '' });
+  /* protected readonly newTaskModel = signal({ title: '' });
   protected readonly newTaskForm = form(this.newTaskModel, schemaPath => {
     required(schemaPath.title);
   });
@@ -52,7 +58,7 @@ export class HomePage {
   protected readonly newCategoryForm = form(this.newCategoryModel, schemaPath => {
     required(schemaPath.name);
   });
-
+ */
   //plain view drag and drop
   protected readonly flatTasks = this.taskService.filteredTasks;
   //tasks grouped by category
@@ -73,28 +79,44 @@ export class HomePage {
     return groups.filter(g => g.tasks.length > 0);
   });
 
-  async addTask(): Promise<void> {
-    if (this.newTaskForm().invalid()) return;
+  async openCategoryManager(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: CategoryComponent,
+    });
+    await modal.present();
+  }
 
-    const title = this.newTaskModel().title.trim();
+  async assignCategory(taskId: string): Promise<void> {
+    const buttons = [
+      ...this.categoryService.categories().map(category => ({
+        text: category.name,
+        handler: () => this.taskService.updateTaskCategory(taskId, category.id),
+      })),
+      {
+        text: 'Uncategorized',
+        handler: () => this.taskService.updateTaskCategory(taskId, null),
+      },
+      { text: 'Cancel', role: 'cancel' as const },
+    ];
+
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Assign category',
+      buttons,
+    });
+    await actionSheet.present();
+  }
+
+  async addTask(): Promise<void> {
+    const title = this.newTaskTitle().trim();
     if (!title) return;
 
     const activeCategory = this.taskService.activeCategoryId();
     const categoryId = activeCategory === 'all' ? null : activeCategory;
 
     await this.taskService.addTask(title, categoryId);
-    this.newTaskModel.set({ title: '' });
+    this.newTaskTitle.set('');
   }
 
-  async addCategory(): Promise<void> {
-    if (this.newCategoryForm().invalid()) return;
-
-    const name = this.newCategoryModel().name.trim();
-    if (!name) return;
-
-    await this.categoryService.addCategory(name);
-    this.newCategoryModel.set({ name: '' });
-  }
 
   async editCategory(categoryId: string, currentName: string): Promise<void> {
     const alert = await this.alertController.create({
@@ -141,7 +163,7 @@ export class HomePage {
     this.taskService.setSearchTerm(term);
   }
 
-  onCategoryFilterChange(value: SegmentValue | undefined): void {
+  onCategoryFilterChange(value: string | number | undefined): void {
     if (value === undefined) return;
 
     const stringValue = String(value);
@@ -167,6 +189,10 @@ export class HomePage {
 
   getCategoryColor(categoryId: string | null): string {
     return this.categoryService.getCategoryById(categoryId)?.color ?? '#8E8E93';
+  }
+
+  getCategoryName(categoryId: string | null): string {
+    return this.categoryService.getCategoryById(categoryId)?.name ?? 'Uncategorized';
   }
 
   trackByCategoryId(index: number, category: Category): string {
