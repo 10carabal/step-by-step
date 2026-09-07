@@ -1,27 +1,27 @@
-#container {
-  text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.completed-task {
+  text-decoration: line-through;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.category-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: var(--ion-color-medium);
 
-  color: #8c8c8c;
-
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+  ion-icon {
+    font-size: 64px;
+    margin-bottom: 12px;
+  }
 }

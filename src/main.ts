@@ -2,7 +2,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { PreloadAllModules, RouteReuseStrategy, provideRouter, withComponentInputBinding, withPreloading } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
 
-import { inject, provideAppInitializer } from '@angular/core';
+import { inject, provideAppInitializer, provideZonelessChangeDetection } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -17,6 +17,7 @@ initializeApp(environment.firebase);
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    provideZonelessChangeDetection(),
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules), withComponentInputBinding()),
     provideAppInitializer(() => {
