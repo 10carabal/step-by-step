@@ -1,0 +1,43 @@
+workflows:
+  ios-capacitor-workflow:
+    name: iOS Capacitor Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      groups:
+        - firebase_credentials
+      vars:
+        XCODE_WORKSPACE: "App.xcworkspace"
+        XCODE_SCHEME: "App"
+      node: 20
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install npm dependencies
+        script: npm install
+      - name: Build Angular app
+        script: npm run build
+      - name: Add iOS platform (if not present) and sync
+        script: |
+          npx cap add ios || true
+          npx cap sync ios
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios/App
+          pod install
+      - name: Build unsigned IPA (ad-hoc, no App Store)
+        script: |
+          cd ios/App
+          xcodebuild -workspace $XCODE_WORKSPACE \
+            -scheme $XCODE_SCHEME \
+            -configuration Debug \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - ios/App/build/**/*.app
+      - ios/App/build/**/*.ipa
+    publishing:
+      email:
+        recipients:
+          - daniel.otero1095@gmail.com
