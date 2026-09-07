@@ -120,3 +120,23 @@ We implemented Angular CDK Virtual Scroll to efficiently handle large volumes of
 For the initial load, in addition to removing Zone.js (Zoneless Change Detection), we applied code-splitting to components that are not required for the first render. A prime example is the category management modal, which is loaded via a dynamic import() only when the user opens it. We evaluated using Angular's @defer block, but that syntax is designed for inline components declared directly in the template. For overlays opened programmatically via ModalController, the correct and recommended equivalent is a dynamic import directly inside the event handler, achieving the exact same code-splitting result.
 
 Firebase credentials are kept out of version control (.gitignore) for security purposes. For the CI/CD pipeline in Codemagic, these were configured as encrypted environment variables (Secure Variable Group). A custom build step then generates the environment.ts and environment.prod.ts files dynamically before compilation. This follows the exact same 'secrets injection' pattern used in real-world production pipelines, effectively preventing credential exposure in both the repository and the build logs.
+
+## iOS Build — Signing Limitation
+
+An unsigned iOS build (`App.app.zip`) is provided, successfully compiled via
+Codemagic CI targeting a real macOS/Xcode environment. A fully signed `.ipa`
+was not produced for the following reason:
+
+Apple requires code signing for any installable iOS build, and both signing
+methods available without an active Apple Developer Program membership
+($99/year) — Development signing (free account) and Ad Hoc distribution
+(paid account) — require registering the UDID of at least one physical iOS
+device. No physical iPhone/iPad was available to complete this step; this
+is a hardware/access constraint, not a configuration gap.
+
+As explicitly anticipated in the test instructions ("No entregar el .IPA...
+aunque eso bajaría puntos"), we prioritized demonstrating full technical
+capability instead: a working macOS/Xcode CI pipeline (Codemagic),
+successful native iOS compilation, and complete Android APK generation
+locally — while being transparent about this specific limitation rather
+than leaving it unaddressed.
