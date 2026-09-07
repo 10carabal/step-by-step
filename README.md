@@ -87,3 +87,20 @@ limited to the initial scaffold commit.
     ├── services/         # TaskService, CategoryService (signals + persistence)
     ├── components/        # Reusable UI pieces
     └── pages/            # Route-level views
+
+## Firebase Setup
+
+This project uses Firebase Remote Config for feature flags. Credentials are
+gitignored for security reasons.
+
+To run this project locally:
+
+1. Create a Firebase project at https://console.firebase.google.com
+2. Register a Web app inside the project (</> icon) and copy the config object
+3. Copy the environment template:
+   \`\`\`bash
+   cp src/environments/environment.example.ts src/environments/environment.ts
+   \`\`\`
+4. Fill in `src/environments/environment.ts` with your Firebase config values
+5. In Firebase Console → Remote Config, create a parameter named
+   `enable_grouped_view` (Boolean, default: `false`)
