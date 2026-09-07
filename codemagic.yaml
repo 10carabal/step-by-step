@@ -46,10 +46,18 @@ workflows:
           EOF
       - name: Build Angular app
         script: npm run build
-      - name: Add iOS platform (if not present) and sync
+      - name: Install iOS platform package
+        script: npm install @capacitor/ios
+      - name: Add iOS platform (only if missing)
         script: |
-          npx cap add ios || true
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
           npx cap sync ios
+      - name: Verify Podfile exists
+        script: |
+          ls -la ios/App/
+          cat ios/App/Podfile
       - name: Install CocoaPods dependencies
         script: |
           cd ios/App
