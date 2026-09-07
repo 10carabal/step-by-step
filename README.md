@@ -104,3 +104,7 @@ To run this project locally:
 4. Fill in `src/environments/environment.ts` with your Firebase config values
 5. In Firebase Console → Remote Config, create a parameter named
    `enable_grouped_view` (Boolean, default: `false`)
+
+## Challenges
+
+We attempted to adopt Signal Forms (a stable API since Angular v17) for the app's inputs. However, we found that Ionic does not yet officially expose support for the FormValueControl interface required by [formField] on its web components (ion-input). This resulted in a runtime error (NG01914) when mounted inside overlays like ion-modal. As a workaround, we opted for a direct binding pattern using a signal combined with Ionic's native event ((ionInput)). This approach maintains the same principle of signal-based, unidirectional data flow without relying on an integration that the ecosystem does not yet support.
