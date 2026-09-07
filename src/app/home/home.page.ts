@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Component, computed, inject, signal } from '@angular/core';
 import {
   ActionSheetController,
@@ -35,7 +36,7 @@ interface TaskGroup {
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonChip, IonButtons, IonItemOption, IonItemOptions, IonReorder, IonCheckbox, IonItemSliding, IonList, IonListHeader, IonReorderGroup, IonLabel, IonSelect, IonSelectOption, IonSearchbar, IonIcon, IonInput, IonItem, IonButton, IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [IonChip, IonButtons, IonItemOption, IonItemOptions, IonReorder, IonCheckbox, IonItemSliding, IonList, IonListHeader, IonReorderGroup, IonLabel, IonSelect, IonSelectOption, IonSearchbar, IonIcon, IonInput, IonItem, IonButton, IonHeader, IonToolbar, IonTitle, IonContent, ScrollingModule],
 })
 export class HomePage {
   protected readonly taskService = inject(TaskService);
@@ -59,6 +60,9 @@ export class HomePage {
     required(schemaPath.name);
   });
  */
+
+  protected readonly useVirtualScroll = computed(() => this.flatTasks().length > 50);
+
   //plain view drag and drop
   protected readonly flatTasks = this.taskService.filteredTasks;
   //tasks grouped by category
@@ -197,6 +201,10 @@ export class HomePage {
 
   trackByCategoryId(index: number, category: Category): string {
     return category.id;
+  }
+
+  trackByTaskId(index: number, task: Task): string {
+    return task.id;
   }
 
 }

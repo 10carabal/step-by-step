@@ -108,3 +108,7 @@ To run this project locally:
 ## Challenges
 
 We attempted to adopt Signal Forms (a stable API since Angular v17) for the app's inputs. However, we found that Ionic does not yet officially expose support for the FormValueControl interface required by [formField] on its web components (ion-input). This resulted in a runtime error (NG01914) when mounted inside overlays like ion-modal. As a workaround, we opted for a direct binding pattern using a signal combined with Ionic's native event ((ionInput)). This approach maintains the same principle of signal-based, unidirectional data flow without relying on an integration that the ecosystem does not yet support.
+
+## Performance
+
+We implemented Angular CDK Virtual Scroll to efficiently handle large volumes of tasks, which triggers automatically once a threshold of 50 items is reached. We evaluated using Ionic's native ion-virtual-scroll, but it has been deprecated since v7 in favor of the standard Angular CDK. Because Virtual Scroll is incompatible with ion-reorder-group drag-and-drop mechanics—as both features compete for physical element existence in the DOM—we designed a hybrid strategy. Smaller lists maintain manual reordering, while larger lists prioritize scroll performance. This approach reflects the fact that manually reordering dozens of tasks one by one ceases to be a useful user interaction at that scale anyway
