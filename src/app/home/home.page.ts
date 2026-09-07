@@ -19,7 +19,6 @@ import {
   IonTitle, IonToolbar, ItemReorderEventDetail,
   ModalController
 } from '@ionic/angular';
-import { CategoryComponent } from '../components/category/category.component';
 import { Category } from '../models/category.model';
 import { Task } from '../models/task.model';
 import { CategoryService } from '../services/category-service';
@@ -84,6 +83,10 @@ export class HomePage {
   });
 
   async openCategoryManager(): Promise<void> {
+
+    const { CategoryComponent } = await import(
+      '../components/category/category.component'
+    );
     const modal = await this.modalController.create({
       component: CategoryComponent,
     });
